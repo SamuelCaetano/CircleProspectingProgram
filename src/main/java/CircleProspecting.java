@@ -1,4 +1,6 @@
+import com.sun.glass.events.KeyEvent;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import javafx.scene.input.KeyCode;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -6,6 +8,9 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -15,6 +20,7 @@ import java.util.List;
 public class CircleProspecting {
     public static String EMAIL = "vidalit2016@gmail.com";
     public static String PASSWORD = "Skater123";
+    public static Robot robot;
 
     public static void main(String args[]){
         File file = new File("C:\\Users\\caets\\Downloads\\myReport.xls");
@@ -29,6 +35,7 @@ public class CircleProspecting {
         WebDriver driver = new ChromeDriver(options);
 
         try {
+            robot = new Robot();
             signIn(driver);
             Thread.sleep(3000);
             findContacts(driver, getOwners(file));
@@ -47,13 +54,25 @@ public class CircleProspecting {
         driver.findElement(By.xpath("//*[@id=\"submit\"]")).click();
     }
 
-    public static void findContacts(WebDriver driver, ArrayList<PropertyOwner> owners){
+    public static void findContacts(WebDriver driver, ArrayList<PropertyOwner> owners) throws InterruptedException {
         for (PropertyOwner owner : owners){
             driver.findElement(By.xpath("//*[@id=\"property-tab\"]")).click();
             driver.findElement(By.xpath("//*[@id=\"fullAddress\"]")).sendKeys(owner.getAddress() + " " + owner.getCitystatezip().split(" ")[0]); //+  " " + owner.getCitystatezip().split(" ")[1]);
-            driver.findElement(By.xpath("//*[@id=\"ui-id-1\"]")).click();
+            //driver.findElement(By.xpath("//*[@id=\"fullAddress\"]")).click();
+            Thread.sleep(1000);
+            robot.mouseMove(1079, 378);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            //System.out.println(MouseInfo.getPointerInfo().getLocation().toString());
+            robot.keyPress(KeyEvent.VK_LEFT);
+            Thread.sleep(1000);
+            robot.keyPress(KeyEvent.VK_ENTER);
+            Thread.sleep(8000);
+            driver.get(driver.findElement(By.xpath("//*[@id=\"ember306\"]")).getAttribute("href"));
+            Thread.sleep(8000);
+            owner.setPhonenumber(driver.findElement(By.xpath("//*[@id=\"overview-section\"]/ul/li[2]/p")).getText());
             driver.findElement(By.id("ui-id-2")).click();
-            driver.findElement(By.xpath("//*[@id=\"property-search-btn-lg\"]")).click();
+            //driver.findElement(By.xpath("//*[@id=\"property-search-btn-lg\"]")).click();
         }
     }
 
